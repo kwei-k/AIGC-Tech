@@ -1,0 +1,33 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.idea/
+.vscode/
+*.swp
+
+# Python (for local tooling / ComfyUI venvs)
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Node (for docs tooling)
+node_modules/
+
+# Generated media — keep the repo text-first
+*.mp4
+*.mov
+*.webm
+*.png
+*.jpg
+*.jpeg
+*.webp
+!assets/**/*.png
+!assets/**/*.jpg
+!assets/**/*.webp
+
+# ComfyUI outputs
+output/
+input/
