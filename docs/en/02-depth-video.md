@@ -159,4 +159,4 @@ The multiplier buys you a hard guarantee — geometry does not drift — that no
 
 ---
 
-**Previous:** [01 — Clay-Render Transfer (白膜迁移)](01-clay-render-transfer.md) · **Next:** [03 — Multistep Video Generation](03-multistep-video-generation.md)
+**Previous:** [01 — Clay-Render Transfer (白模迁移)](01-clay-render-transfer.md) · **Next:** [03 — Multistep Video Generation](03-multistep-video-generation.md)

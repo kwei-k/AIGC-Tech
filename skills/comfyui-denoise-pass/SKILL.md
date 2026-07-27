@@ -58,9 +58,9 @@ reason to change them. Denoise strength is the knob; everything else is scaffold
 
 ## Step 2: Pick the denoise strength
 
-Denoise strength trades identity preservation against blending force. These are
-starting points within the 0.15–0.4 window — tune per shot, and check current ComfyUI
-docs as of 2026 since sampler behavior is version-sensitive.
+Denoise strength trades identity preservation against blending force. The P1 safe
+envelope is 0.15–0.4, and the default starting point is 0.25. Tune per shot, and check
+current ComfyUI docs since sampler behavior is version-sensitive.
 
 | How far is the subject from the plate? | Starting denoise | What it does |
 |---|---|---|

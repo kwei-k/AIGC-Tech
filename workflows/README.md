@@ -1,7 +1,10 @@
 # workflows/
 
-Example ComfyUI workflow JSONs referenced by
+Contribution contract for future ComfyUI workflow JSONs referenced by
 [docs/en/05-comfyui-integration.md](../docs/en/05-comfyui-integration.md).
+
+**Current status:** no executable workflow JSON is committed yet. The written P1–P4
+recipes are guidance, not a claim that a graph in this directory has been load-tested.
 
 ## Convention
 
@@ -13,5 +16,6 @@ Example ComfyUI workflow JSONs referenced by
   and the approval checklist from the corresponding recipe in doc 05.
 - Workflows must load with stock nodes plus, where noted, `comfyui_controlnet_aux`.
 
-No workflows are committed yet — this directory establishes the convention.
-Contributions welcome: see [CONTRIBUTING.md](../CONTRIBUTING.md).
+Contributions welcome: see [CONTRIBUTING.md](../CONTRIBUTING.md). Remove the current
+status notice only after at least one workflow and its companion note pass the loading
+check described above.

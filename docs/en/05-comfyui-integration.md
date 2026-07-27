@@ -64,6 +64,12 @@ ComfyUI build and node packs.
 diffusion model re-integrate edges, light wrap, and contact shadow — while changing
 nothing else.
 
+The P1 **safe envelope is 0.15–0.4** denoise, and the **default starting point is
+0.25**. Move within that envelope only after checking the mask: 0.15–0.2 for grain/tone,
+0.2–0.3 for ambient color, and 0.3–0.4 for a harder light or edge mismatch. If the pass
+needs more than 0.4, fix or regenerate the upstream subject instead of asking P1 to
+redesign it.
+
 1. Build the naive composite upstream (editor, Photoshop, or an
    `ImageCompositeMasked` node). Freeze it.
 2. In ComfyUI:
@@ -72,7 +78,7 @@ nothing else.
    - `FeatherMask` (grow/feather 8–16 px starting point) so the model owns the
      boundary, not you.
    - `VAE Encode` → `Set Latent Noise Mask` (connect the feathered mask).
-   - `KSampler` with **denoise 0.2–0.4 starting point**, low enough that only the
+   - `KSampler` with **denoise 0.25 as the default starting point**, low enough that only the
      masked region and its light interaction move. Prompt: describe the *lighting and
      material interaction* ("soft rim light from the window on the subject's left"),
      not the content.
