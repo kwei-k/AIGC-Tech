@@ -21,7 +21,7 @@ Output a **numbered plan with markdown checkboxes** (`- [ ]`) for every actionab
 2. **Generation order with rationale** — background first (it defines light, palette, and perspective), subject second (generated against the frozen plate's lighting notes), interaction passes last. State *why* in one sentence per step, tied to which constraint each step carries.
 3. **Per-step asset/prompt specs** — for each step: input assets (use placeholder names in angle brackets for user assets, e.g. `<character_reference.png>`, `<style_still.png>`), the prompt skeleton, duration/resolution target, and which routing question (Q1–Q6) the spec answers.
 4. **Mid-pipeline ComfyUI passes** — for each pass name the node chain (real nodes only: KSampler, VAE Encode/Decode, ControlNet Apply, Depth Anything, IPAdapter, mask/composite nodes, upscale model nodes) and give parameter starting points, explicitly marked as starting points. Typical passes:
-   - **Harmonize denoise (img2img on the merged frame):** KSampler denoise 0.25–0.45 (start at 0.35); lower preserves the subject, higher unifies style but drifts identity.
+   - **Harmonize denoise (img2img on the merged frame):** the P1 safe envelope is 0.15–0.4, and the default starting point is 0.25. Lower preserves the subject; higher unifies a harder lighting/edge mismatch but increases identity drift. If 0.4 is not enough, fix the mask or upstream subject instead of raising denoise.
    - **Relight/color match:** match subject black point and white point to the plate before denoise; a curves/levels pass is cheaper than sampling and should be tried first.
    - **Structure lock during denoise:** ControlNet Apply with a Depth Anything depth map of the merged frame (ControlNet strength start 0.6–0.8) so the denoise pass cannot move geometry.
    - **Identity anchor:** IPAdapter fed with `<character_reference.png>` during the subject pass and any denoise pass that touches the subject's face (weight start 0.5–0.7).
@@ -52,9 +52,9 @@ Shot: "A character walks through a stylized forest and touches a tree." (The fra
   - [ ] 3c. Interaction: mask around hand–tree contact region; note occlusion layers (foreground branches) as separate masks (Q4).
 - [ ] **4. Mid-pipeline ComfyUI passes**
   - [ ] 4a. Levels/curves match of subject to plate black/white points — try before any sampling.
-  - [ ] 4b. Harmonize denoise on merged frames: KSampler, denoise start 0.35 (range 0.25–0.45), ControlNet Apply + Depth Anything depth of the merged frame at strength start 0.7, IPAdapter on `<character_reference.png>` at 0.6 over the face region.
+  - [ ] 4b. Harmonize denoise on merged frames: KSampler, denoise default start 0.25 (P1 safe envelope 0.15–0.4), ControlNet Apply + Depth Anything depth of the merged frame at strength start 0.7, IPAdapter on `<character_reference.png>` at 0.6 over the face region.
   - [ ] 4c. Upscale model pass on approved merged frames only.
-- [ ] **5. Merge strategy: pixel space.** Occlusion here is simple (branches in front, tree behind the hand); masks on decoded frames are inspectable and cheap. Move to latent merge only if the QA gate shows edge smearing or light-wrap mismatch that curves + 0.35-denoise cannot fix.
+- [ ] **5. Merge strategy: pixel space.** Occlusion here is simple (branches in front, tree behind the hand); masks on decoded frames are inspectable and cheap. Move to latent merge only if the QA gate shows edge smearing or light-wrap mismatch that curves + a 0.25-denoise P1 pass cannot fix.
 - [ ] **6. QA gates (freeze on pass)**
   - [ ] Gate A (plate): style matches `<style_still.png>`; light direction consistent across frames; tree position stable. → freeze as `<plate_approved.mp4>`.
   - [ ] Gate B (subject): face matches `<character_reference.png>` in ≥9 of 10 spot-checked frames; walk reads as walking, no foot sliding at contact speed. → freeze as `<subject_approved.mp4>`.

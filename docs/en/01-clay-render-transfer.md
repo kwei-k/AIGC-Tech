@@ -1,4 +1,4 @@
-# 01 — Clay-Render Transfer (白膜迁移)
+# 01 — Clay-Render Transfer (白模迁移)
 
 [中文版本](../zh/01-clay-render-transfer.md)
 

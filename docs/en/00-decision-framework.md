@@ -27,8 +27,9 @@ you asked one sampling pass to satisfy six constraints at once.
 **Multi-step AIGC exists to spend the budget one dimension at a time.** Generate the
 background without worrying about the character. Generate the character without
 worrying about the background. Denoise, upscale, or restyle in between. Composite at
-the end. Each pass carries one or two constraints, so each pass succeeds at high rate —
-and a chain of 90%-success steps beats a single 15%-success mega-prompt.
+the end. Each pass carries one or two constraints, and every approved artifact becomes
+a frozen input. A failed downstream pass can then be retried locally instead of forcing
+the whole shot to be regenerated.
 
 The cost is orchestration: more steps, more intermediate artifacts, more places to
 drift. This framework tells you when that cost is worth paying.
@@ -39,54 +40,75 @@ Answer these about your **target frame/shot** before touching any tool:
 
 | # | Question | Why it routes |
 |---|----------|---------------|
-| Q1 | How long is the final shot? | >10s pushes you out of single-pass territory; minutes pushes you to long-take chaining. |
+| Q1 | How long is the final shot? | Going beyond the chosen model's verified reliable clip length adds T5; do not hard-code a universal 10s limit. |
 | Q2 | Must the subject stay *identical* across shots/frames? | Character consistency is the #1 reason to split generation into steps. |
 | Q3 | Do you need exact control of composition/camera? | "Exact" means structural guidance (depth, clay render, 3D previz), not prompt engineering. |
-| Q4 | Does the subject interact with the environment (contact shadows, occlusion, reflections)? | Interaction is what makes naive compositing look fake; it decides between T2/T3/T4. |
+| Q4 | Does the subject interact with the environment (contact shadows, occlusion, reflections)? | Required interaction adds T4; structural guidance from Q3/Q5 may still compose with it. |
 | Q5 | Is the target realistic, stylized, or a restyle of existing footage? | Restyle → video-to-video. From scratch → text/image-to-video. |
-| Q6 | What is your compute/time budget per final second? | Chained pipelines cost 5–50× a single pass. Sometimes "good enough in one shot" wins. |
+| Q6 | What is your compute/time budget per final second? | Cost compounds across passes, retries, overlap, and human QA. Estimate those inputs instead of quoting one universal multiplier. |
 
 ## 3. The Technique Ladder
 
 Ordered from cheapest (try first) to most orchestrated (use when cheaper rungs fail).
 Full details in the linked docs.
 
-| Rung | Technique | Doc | One-line summary |
-|------|-----------|-----|------------------|
-| **T0** | Single-pass text-to-video | *(external tools)* | One prompt, one clip. The baseline — always try first. |
-| **T1** | Image-to-video, keyframe-anchored | *(external tools)* | Lock the first (and last) frame with a still you control. |
-| **T2** | Depth/structure-guided video | [02](02-depth-video.md) | Extract depth/pose per frame, steer generation with it. |
-| **T3** | Clay-render transfer (白膜迁移) | [01](01-clay-render-transfer.md) | 3D blockout → untextured "clay" render → AI restyle with geometry locked. |
-| **T4** | Multistep compositing | [03](03-multistep-video-generation.md) | Background plate → subject → merge, with ComfyUI passes (denoise, relight, upscale) in between. |
-| **T5** | Long-take chaining (一镜到底) | [04](04-long-take-continuous-shot.md) | Chunk a minutes-long shot into overlapping segments with continuity anchors. |
+| Rung | Technique | Role | Doc |
+|------|-----------|------|-----|
+| **T0** | Single-pass text-to-video | Baseline when no higher constraint applies. | *(external tools)* |
+| **T1** | Image-to-video, keyframe-anchored | Identity anchor; composes with T3/T4/T5. | *(external tools)* |
+| **T2** | Depth/structure-guided video | Existing-footage structure source. | [02](02-depth-video.md) |
+| **T3** | Clay-render transfer (白模迁移) | Exact geometry/camera controller when a 3D blockout is available. | [01](01-clay-render-transfer.md) |
+| **T4** | Multistep compositing | Interaction and per-element control layer. | [03](03-multistep-video-generation.md) |
+| **T5** | Long-take chaining (一镜到底) | Duration wrapper around the per-segment pipeline. | [04](04-long-take-continuous-shot.md) |
 
 Rungs compose. A real production pipeline is often T3 for the environment, T4 to marry
 subject and background, T5 to stretch it to final duration.
 
-## 4. The Decision Tree
+## 4. The Composable Routing Map
+
+Do not stop at the first "yes." **Evaluate all six constraints** before returning a
+route. T1, T4, and T5 are commonly added on top of a structural route; T5 is a duration
+wrapper, not a replacement for the identity, geometry, or interaction work inside each
+segment.
 
 ```mermaid
 flowchart TD
-    A[Target shot defined] --> B{Duration > model's<br/>reliable clip length?}
-    B -- No --> C{Need exact composition<br/>or camera path?}
-    B -- Yes --> T5[T5: Long-take chaining<br/>→ doc 04]
-    C -- No --> D{Subject identity must<br/>match an existing design?}
-    C -- Yes --> E{Do you have or can you build<br/>a 3D blockout / previz?}
-    D -- No --> F{Single character +<br/>complex environment interaction?}
-    D -- Yes --> G[T1: Image-to-video with a<br/>curated keyframe of your subject]
-    E -- Yes --> T3[T3: Clay-render transfer<br/>→ doc 01]
-    E -- No --> H{Restyling existing footage?}
-    H -- Yes --> T2[T2: Depth-guided video-to-video<br/>→ doc 02]
-    H -- No --> T4
-    F -- No --> T0[T0: Single-pass text-to-video.<br/>Try 3-5 seeds before escalating.]
-    F -- Yes --> T4[T4: Multistep compositing<br/>→ doc 03]
-    T0 -. fails on consistency .-> G
-    G -. fails on environment .-> T4
-    T4 -. needs longer duration .-> T5
+    A[Target shot defined] --> Q[Evaluate Q1–Q6 independently]
+    Q --> I{Identity must match<br/>an existing design?}
+    I -- Yes --> T1[T1: keyframe identity anchor]
+    Q --> S{Restyling existing footage?}
+    S -- Yes --> T2[T2: depth / structure guidance]
+    Q --> C{Exact composition<br/>or camera path?}
+    C -- Yes, 3D available --> T3[T3: clay-render transfer]
+    C -- Yes, no 3D or footage --> T4[T4: multistep control fallback]
+    Q --> X{Complex subject /<br/>environment interaction?}
+    X -- Yes --> T4
+    Q --> D{Beyond the model's<br/>reliable clip length?}
+    D -- Yes --> T5[T5: duration wrapper]
+    Q --> N{No higher constraint?}
+    N -- Yes --> T0[T0: try 3–5 seeds]
+    T0 --> O[Return every required rung]
+    T1 --> O
+    T2 --> O
+    T3 --> O
+    T4 --> O
+    T5 --> O
 ```
 
-**How to read it:** always enter at the cheapest rung that your Q1–Q6 answers allow.
-Escalate only when a rung demonstrably fails — and escalate *one dimension at a time*.
+Apply the map in this order:
+
+1. Add **T1** when an existing subject design must stay recognizable.
+2. Add **T2** when existing footage already owns the camera and geometry.
+3. Otherwise add **T3** for exact camera/geometry when a 3D blockout is available;
+   use **T4** as the controllable fallback when neither footage nor 3D is available.
+4. Add **T4** whenever contact, occlusion, reflection, or another complex interaction
+   requires separate elements and a merge.
+5. Add **T5** when the resulting per-segment pipeline must be chained for duration.
+6. Return **T0** only when none of T1–T5 is required.
+
+The executable reference in
+[`scripts/route-shot.mjs`](../../scripts/route-shot.mjs) and its regression cases in
+[`tests/routing.test.mjs`](../../tests/routing.test.mjs) implement these same rules.
 
 ## 5. Scenario Routing Table
 
@@ -96,8 +118,9 @@ Escalate only when a rung demonstrably fails — and escalate *one dimension at 
 | Product hero shot, exact packshot at the end | T1 (end-frame anchor) | The last frame is the only frame that must be exact. |
 | Turn real drone footage into anime | T2 (depth + style) | Geometry is already correct; only appearance changes. |
 | Precise camera dolly through a stylized city | T3 | Camera paths are a 3D problem. Prompt them and you get drift. |
-| Character walks through a generated forest, touches a tree | T4 | Contact/interaction demands per-element control plus a merge pass. |
+| Designed character walks through a generated forest, touches a tree | T1 + T4 | T1 anchors the design; contact/interaction adds per-element control and a merge pass. |
 | 10-minute one-shot music video | T5 on top of T3/T4 | No model holds coherence for minutes; chain segments with anchors. |
+| 30s designed character, exact dolly, touches reflective glass | T1 + T3 + T4 + T5 | Identity, camera, interaction, and duration are independent constraints; none replaces another. |
 | Talking-head close-up with lip sync | Specialized tool, not this stack | Lip sync is its own budget; don't pay it inside a general pipeline. |
 
 ## 6. Escalation Discipline
@@ -143,4 +166,4 @@ See [05 — ComfyUI integration patterns](05-comfyui-integration.md) for the rec
 
 ---
 
-**Next:** [01 — Clay-Render Transfer (白膜迁移)](01-clay-render-transfer.md)
+**Next:** [01 — Clay-Render Transfer (白模迁移)](01-clay-render-transfer.md)

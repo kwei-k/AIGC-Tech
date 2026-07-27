@@ -1,9 +1,10 @@
-# AIGC Multistep Playbook
+# AIGC-Tech
 
-**Stop asking "which model is best?" Start asking "which technique does this shot need?"**
+**A decision-first multistep video playbook. Stop asking "which model is best?" Start
+asking "which technique does this shot need?"**
 
 A decision-first field guide to multi-step AIGC video production: clay-render transfer
-(白膜迁移), depth-guided video, multistep compositing (background → subject → merge,
+(白模迁移), depth-guided video, multistep compositing (background → subject → merge,
 with surgical ComfyUI passes in between), and long-take chaining for minutes-long
 one-shots — plus agent-loadable skills that route your target frame to the right pipeline.
 
@@ -29,8 +30,8 @@ A single prompt that demands character identity + precise camera + style + 30s d
 + environment interaction fails most of the time. Not because models are bad, but
 because one sampling pass cannot satisfy six constraints at once. **Multi-step AIGC
 spends the complexity budget one dimension at a time** — generate the background, then
-the character, denoise in ComfyUI, then merge — and a chain of 90%-success steps beats
-a single 15%-success mega-prompt.
+the character, denoise in ComfyUI, then merge. Each approved artifact becomes a frozen
+input, so a downstream failure can be retried without throwing away everything upstream.
 
 This repo is the routing layer: a decision framework, per-technique playbooks, and
 skills that let an agent do the routing for you.
@@ -39,18 +40,29 @@ skills that let an agent do the routing for you.
 
 ```mermaid
 flowchart TD
-    A[Your target shot] --> B{> 10s duration?}
-    B -- Yes --> T5[Long-take chaining]
-    B -- No --> C{Exact camera / composition?}
-    C -- Yes --> T3[Clay-render transfer]
-    C -- No --> D{Subject must match a design?}
-    D -- Yes --> T1[Image-to-video, keyframe-anchored]
-    D -- No --> E{Subject + environment interaction?}
-    E -- Yes --> T4[Multistep compositing]
-    E -- No --> T0[Single-pass text-to-video — try 3-5 seeds first]
+    A[Your target shot] --> Q[Evaluate all six constraints]
+    Q --> I{Identity must match?}
+    I -- Yes --> T1[T1 identity anchor]
+    Q --> S{Restyle existing footage?}
+    S -- Yes --> T2[T2 depth / structure guidance]
+    Q --> C{Exact camera or composition?}
+    C -- Yes, with 3D --> T3[T3 clay-render transfer]
+    C -- Yes, without 3D --> T4[T4 multistep control]
+    Q --> X{Complex interaction?}
+    X -- Yes --> T4
+    Q --> D{Beyond reliable clip length?}
+    D -- Yes --> T5[T5 duration wrapper]
+    Q --> N{No higher constraint?}
+    N -- Yes --> T0[T0 single pass]
+    T1 --> O[Compose every required rung]
+    T2 --> O
+    T3 --> O
+    T4 --> O
+    T5 --> O
+    T0 --> O
 ```
 
-Full tree, routing table, and escalation rules:
+Full composable routing map, scenario table, and escalation rules:
 **[docs/en/00-decision-framework.md](docs/en/00-decision-framework.md)**
 
 ## Documentation
@@ -58,7 +70,7 @@ Full tree, routing table, and escalation rules:
 | # | Doc (EN) | 中文 | What it answers |
 |---|----------|------|-----------------|
 | 00 | [The Decision Framework](docs/en/00-decision-framework.md) | [决策框架](docs/zh/00-decision-framework.md) | Which technique for your target frame — start here. |
-| 01 | [Clay-Render Transfer (白膜迁移)](docs/en/01-clay-render-transfer.md) | [白膜迁移](docs/zh/01-clay-render-transfer.md) | Lock geometry with a 3D blockout, restyle with AI. |
+| 01 | [Clay-Render Transfer (白模迁移)](docs/en/01-clay-render-transfer.md) | [白模迁移](docs/zh/01-clay-render-transfer.md) | Lock geometry with a 3D blockout, restyle with AI. |
 | 02 | [Depth-Guided Video](docs/en/02-depth-video.md) | [深度视频](docs/zh/02-depth-video.md) | Per-frame depth as the steering wheel for v2v and restyle. |
 | 03 | [Multistep Video Generation](docs/en/03-multistep-video-generation.md) | [多步骤视频生成](docs/zh/03-multistep-video-generation.md) | Background plate → subject → merge, with ComfyUI passes between steps. |
 | 04 | [Long-Take Chaining (一镜到底)](docs/en/04-long-take-continuous-shot.md) | [长镜头一镜到底](docs/zh/04-long-take-continuous-shot.md) | Minutes-long continuous shots via overlapping segments + anchors. |
@@ -76,13 +88,24 @@ packages the routing logic so an agent can plan your pipeline instead of guessin
 | [multistep-video-planner](skills/multistep-video-planner/SKILL.md) | Turns a shot description into a step-by-step multistep plan: plates, passes, merge points, QA gates. |
 | [comfyui-denoise-pass](skills/comfyui-denoise-pass/SKILL.md) | Designs the mid-pipeline denoise/relight pass: strength ranges, node order, failure checks. |
 
+## Validate the playbook
+
+The routing cases, bilingual structure, local links, Skill metadata, and repository
+claims are checked without third-party dependencies:
+
+```bash
+npm test
+```
+
 ## Repo layout
 
 ```
 ├── docs/en, docs/zh      # the playbook, mirrored in English and Chinese
 ├── skills/               # agent-loadable skills (SKILL.md format)
-├── workflows/            # example ComfyUI workflow JSONs + notes
-├── assets/               # diagrams and stills (video examples are linked, not committed)
+├── scripts/              # executable reference implementation of the routing rules
+├── tests/                # routing cases and repository consistency checks
+├── workflows/            # contribution contract; executable examples are not committed yet
+├── assets/               # reserved for future stills; current diagrams use Mermaid in docs
 └── CONTRIBUTING.md       # how to add a technique or update the routing logic
 ```
 

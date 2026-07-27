@@ -117,11 +117,11 @@ The merge is not one paste. It is a short chain:
    harmonization pass sees a plausible scene instead of inventing shadows
    inconsistently per frame.
 3. **Low-strength denoise/relight pass (ComfyUI).** VAE Encode the composite
-   frame sequence, run KSampler at low denoise — **start at 0.25–0.35** (starting
-   point, not a law) — with the same model family that generated the plate, then
-   VAE Decode. This re-renders the pasted edges into the plate's lighting and
-   grain. Above ~0.45 the pass starts redesigning your frozen artifacts; below
-   ~0.2 it does nothing.
+   frame sequence, then follow the canonical P1 guidance in doc 05: the safe
+   envelope is **0.15–0.4** and the default starting point is **0.25**. Use the
+   same model family that generated the plate, then VAE Decode. This re-renders
+   the pasted edges into the plate's lighting and grain. If 0.4 is not enough,
+   fix the mask, lighting match, or upstream subject instead of raising denoise.
 4. **Color match.** Match black/white points and white balance of subject to
    plate. Often a simple curves/levels grade does more than another AI pass.
 5. **Upscale + detail.** Run an upscale-model pass on the *merged, approved*

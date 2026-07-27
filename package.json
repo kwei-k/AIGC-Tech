@@ -1,0 +1,13 @@
+{
+  "name": "aigc-tech",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "validate": "node --test tests/repository.test.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

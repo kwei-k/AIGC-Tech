@@ -10,7 +10,8 @@ pipeline that actually shipped.
   points. PRs that only add hype will be rejected; PRs that add failure modes are gold.
 - **Decision-framework updates**: `docs/en/00-decision-framework.md` is the heart of
   this repo. If a new model or tool changes the routing logic, propose the change with
-  a concrete before/after example.
+  a concrete before/after example and add or update a case in
+  `tests/routing.test.mjs`.
 - **Skills**: agent-loadable skills live in `skills/<name>/SKILL.md` and must follow the
   Agent Skills format (YAML frontmatter with `name` and `description`, then instructions).
 - **Workflows**: ComfyUI workflow JSONs go in `workflows/` and must be loadable with the
@@ -24,6 +25,19 @@ pipeline that actually shipped.
 3. Every claim about a tool's behavior should be verifiable — cite a version or a date
    when behavior is version-sensitive.
 4. Keep it practical: this is a playbook for people shipping shots, not a survey paper.
+
+## Validate a change
+
+Run the zero-dependency suite before opening a PR:
+
+```bash
+npm test
+```
+
+It checks the executable routing cases, local Markdown links, English/Chinese filename
+parity, Skill metadata, and claims about workflow/assets that are actually present.
+When editing a Skill, also validate its folder with the Agent Skills validator available
+in your agent environment.
 
 ## Style
 
