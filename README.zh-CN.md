@@ -1,11 +1,11 @@
 # AIGC-Tech
 
-**一本决策优先的多步骤视频实战手册。先选择技术，再编译运动，最后生成镜头。**
+**一本决策优先的多步骤视频实战手册。先选择技术，再组织运动，最后生成镜头。**
 
 一本决策优先的多步骤 AIGC 视频制作实战指南:白模迁移、深度引导视频、
 多步骤合成(先生成背景 → 再生成人物 → 合并,中间穿插 ComfyUI 手术式处理)、
-分钟级一镜到底的链式拼接，以及运动优先的提示词编译——外加可直接被 agent
-加载的 skill，让 agent 把目标画面路由到正确流水线，并将导演意图编译成
+分钟级一镜到底的链式拼接，以及运动优先的提示词写作模板——外加可直接被 agent
+加载的 skill，让 agent 把目标画面路由到正确流水线，并将导演意图整理成
 可执行的视频指令。
 
 [English README](README.md) · [决策框架](docs/zh/00-decision-framework.md) · [Skills](#agent-skills) · [贡献指南](CONTRIBUTING.md)
@@ -31,7 +31,7 @@
 下游失败时只重试当前步骤,不用把上游全部推倒重来。
 
 这个仓库是控制层:一套决策框架、按技术分类的实战手册,
-以及让 agent 完成镜头路由、步骤规划和提示词编译的 skill。
+以及让 agent 完成镜头路由、步骤规划和提示词写作的 skill。
 
 ## 60 秒速览
 
@@ -73,7 +73,7 @@ flowchart TD
 | 04 | [长镜头一镜到底](docs/zh/04-long-take-continuous-shot.md) | [Long-Take Chaining](docs/en/04-long-take-continuous-shot.md) | 重叠分段 + 连续性锚点,拼出分钟级长镜头。 |
 | 05 | [ComfyUI 集成模式](docs/zh/05-comfyui-integration.md) | [ComfyUI Integration Patterns](docs/en/05-comfyui-integration.md) | 降噪、重打光、潜空间合并、超分——步骤之间的工作台。 |
 | 06 | [管线配方](docs/zh/06-pipeline-recipes.md) | [Pipeline Recipes](docs/en/06-pipeline-recipes.md) | 组合多种技术的端到端完整案例。 |
-| 07 | [运动优先的提示词编译](docs/zh/07-motion-first-prompt-compilation.md) | [Motion-First Prompt Compilation](docs/en/07-motion-first-prompt-compilation.md) | 把导演意图、参考图和模型反馈转化成可执行提示词。 |
+| 07 | [运动优先的视频提示词写作模板](docs/zh/07-motion-first-video-prompt-template.md) | [Motion-First Video Prompt Template](docs/en/07-motion-first-video-prompt-template.md) | 把当前导演意图和有明确身份的参考图组织成一段可直接复制的提示词。 |
 
 ## Agent Skills
 
@@ -85,7 +85,7 @@ flowchart TD
 | [aigc-technique-router](skills/aigc-technique-router/SKILL.md) | 用六个路由问题访谈你的目标镜头,输出带理由的流水线推荐。 |
 | [multistep-video-planner](skills/multistep-video-planner/SKILL.md) | 把镜头描述变成分步执行计划:背景板、中间处理、合并点、质检门。 |
 | [comfyui-denoise-pass](skills/comfyui-denoise-pass/SKILL.md) | 设计管线中段的降噪/重打光步骤:强度区间、节点顺序、失败检查项。 |
-| [compile-video-prompt](skills/compile-video-prompt/SKILL.md) | 把导演意图与有明确类型的参考图编译成一段运动优先提示词和紧凑的 Negative。 |
+| [write-video-prompt](skills/write-video-prompt/SKILL.md) | 根据当前导演需求和有明确身份的参考图，写一段运动优先提示词和紧凑的 Negative。 |
 
 ## 验证手册
 
@@ -114,7 +114,7 @@ npm test
 3. **升级前先说出是哪个约束失败了**,一次只升一个维度。
 4. **冻结已验收的产物。** 绝不在下游重新生成已批准步骤的上游输入。
 5. **记录失败模式。** 知道什么时候*不该*用某项技术,是手册的一半价值。
-6. **编译意图,不要堆形容词。** 先表达摄影机、主体和场景运动,最后才写影调。
+6. **组织意图,不要堆形容词。** 先表达摄影机、主体和场景运动,最后才写影调。
 
 ## License
 
