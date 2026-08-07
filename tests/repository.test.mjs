@@ -104,6 +104,74 @@ test("Agent Skills have minimal valid frontmatter", () => {
   }
 });
 
+test("README Skill badge matches the loadable Skill count", () => {
+  const skillsRoot = path.join(repoRoot, "skills");
+  const skillCount = readdirSync(skillsRoot).filter((folder) =>
+    existsSync(path.join(skillsRoot, folder, "SKILL.md"))
+  ).length;
+
+  assert.match(
+    read("README.md"),
+    new RegExp(`agent%20skills-${skillCount}-green`)
+  );
+  assert.match(
+    read("README.zh-CN.md"),
+    new RegExp(`agent%20skills-${skillCount}-green`)
+  );
+});
+
+test("motion-first prompt contract is typed, ordered, and implicitly loadable", () => {
+  const contract = read(
+    "skills/compile-video-prompt/references/motion-first-contract.md"
+  );
+  const metadata = read("skills/compile-video-prompt/agents/openai.yaml");
+  const canonicalOrder = [
+    "CAMERA MOVEMENT",
+    "SUBJECT MOTION",
+    "SCENE MOTION",
+    "LOOK AND CAPTURE CHARACTER"
+  ];
+
+  let previousIndex = -1;
+  for (const clause of canonicalOrder) {
+    const index = contract.indexOf(clause);
+    assert.ok(index > previousIndex, `${clause} is out of canonical order`);
+    previousIndex = index;
+  }
+
+  for (const role of [
+    "first_frame",
+    "middle_frame",
+    "final_frame",
+    "composition_reference",
+    "camera_reference",
+    "action_reference",
+    "look_reference",
+    "character_identity",
+    "wardrobe_reference",
+    "ui_packaging_reference"
+  ]) {
+    assert.match(contract, new RegExp(`\\b${role}\\b`));
+  }
+
+  assert.match(contract, /composition_reference.*MUST NOT become a frame anchor/i);
+  assert.match(contract, /Negative:/);
+  assert.match(metadata, /allow_implicit_invocation:\s*true/);
+
+  const example = contract.slice(contract.indexOf("Default English rendering:"));
+  let exampleIndex = -1;
+  for (const phrase of [
+    "slow steady dolly-in",
+    "a poised young woman walks",
+    "hair and soft fabric respond",
+    "soft directional key light"
+  ]) {
+    const index = example.indexOf(phrase);
+    assert.ok(index > exampleIndex, `${phrase} is out of order in the worked example`);
+    exampleIndex = index;
+  }
+});
+
 test("README describes empty workflow and asset directories honestly", () => {
   const readme = read("README.md");
   const chineseReadme = read("README.zh-CN.md");

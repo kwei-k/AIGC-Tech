@@ -1,0 +1,7 @@
+interface:
+  display_name: "Motion-First Video Prompt"
+  short_description: "Compile director intent into executable video prompts"
+  default_prompt: "Use $compile-video-prompt to turn this shot brief and its references into a concise, motion-first generation prompt."
+
+policy:
+  allow_implicit_invocation: true

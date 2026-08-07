@@ -1,18 +1,19 @@
 # AIGC-Tech
 
-**A decision-first multistep video playbook. Stop asking "which model is best?" Start
-asking "which technique does this shot need?"**
+**A decision-first multistep video playbook. Choose the technique, compile the motion,
+then generate the shot.**
 
 A decision-first field guide to multi-step AIGC video production: clay-render transfer
 (白模迁移), depth-guided video, multistep compositing (background → subject → merge,
 with surgical ComfyUI passes in between), and long-take chaining for minutes-long
-one-shots — plus agent-loadable skills that route your target frame to the right pipeline.
+one-shots, and motion-first prompt compilation — plus agent-loadable skills that route
+your target frame and turn director intent into executable video instructions.
 
 [中文 README](README.zh-CN.md) · [Decision Framework](docs/en/00-decision-framework.md) · [Skills](#agent-skills) · [Contributing](CONTRIBUTING.md)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Docs: EN + 中文](https://img.shields.io/badge/docs-EN%20%2B%20%E4%B8%AD%E6%96%87-blue)](docs/)
-[![Agent Skills](https://img.shields.io/badge/agent%20skills-3-green)](skills/)
+[![Agent Skills](https://img.shields.io/badge/agent%20skills-4-green)](skills/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 ---
@@ -33,8 +34,8 @@ spends the complexity budget one dimension at a time** — generate the backgrou
 the character, denoise in ComfyUI, then merge. Each approved artifact becomes a frozen
 input, so a downstream failure can be retried without throwing away everything upstream.
 
-This repo is the routing layer: a decision framework, per-technique playbooks, and
-skills that let an agent do the routing for you.
+This repo is the control layer: a decision framework, per-technique playbooks, and
+skills that route the shot, plan its passes, and compile each generative prompt.
 
 ## The 60-second version
 
@@ -76,6 +77,7 @@ Full composable routing map, scenario table, and escalation rules:
 | 04 | [Long-Take Chaining (一镜到底)](docs/en/04-long-take-continuous-shot.md) | [长镜头一镜到底](docs/zh/04-long-take-continuous-shot.md) | Minutes-long continuous shots via overlapping segments + anchors. |
 | 05 | [ComfyUI Integration Patterns](docs/en/05-comfyui-integration.md) | [ComfyUI 集成模式](docs/zh/05-comfyui-integration.md) | Denoise, relight, latent-merge, upscale — the workbench between steps. |
 | 06 | [Pipeline Recipes](docs/en/06-pipeline-recipes.md) | [管线配方](docs/zh/06-pipeline-recipes.md) | End-to-end worked examples combining the techniques. |
+| 07 | [Motion-First Prompt Compilation](docs/en/07-motion-first-prompt-compilation.md) | [运动优先的提示词编译](docs/zh/07-motion-first-prompt-compilation.md) | Turn director intent, references, and model feedback into executable prompts. |
 
 ## Agent Skills
 
@@ -87,6 +89,7 @@ packages the routing logic so an agent can plan your pipeline instead of guessin
 | [aigc-technique-router](skills/aigc-technique-router/SKILL.md) | Interviews you about the target shot (the six routing questions) and returns a recommended pipeline with rationale. |
 | [multistep-video-planner](skills/multistep-video-planner/SKILL.md) | Turns a shot description into a step-by-step multistep plan: plates, passes, merge points, QA gates. |
 | [comfyui-denoise-pass](skills/comfyui-denoise-pass/SKILL.md) | Designs the mid-pipeline denoise/relight pass: strength ranges, node order, failure checks. |
+| [compile-video-prompt](skills/compile-video-prompt/SKILL.md) | Compiles director intent and typed references into one motion-first prompt plus a compact Negative line. |
 
 ## Validate the playbook
 
@@ -116,6 +119,7 @@ npm test
 3. **Name the failing constraint** before escalating one dimension at a time.
 4. **Freeze approved artifacts.** Never regenerate upstream of a step you approved.
 5. **Document failure modes.** Knowing when a technique is wrong is half the playbook.
+6. **Compile intent, not adjectives.** Express camera, subject, and scene motion before look.
 
 ## License
 

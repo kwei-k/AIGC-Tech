@@ -1,18 +1,18 @@
 # AIGC-Tech
 
-**一本决策优先的多步骤视频实战手册。别再问"哪个模型最强",
-开始问"这个镜头该用哪种技术"。**
+**一本决策优先的多步骤视频实战手册。先选择技术，再编译运动，最后生成镜头。**
 
 一本决策优先的多步骤 AIGC 视频制作实战指南:白模迁移、深度引导视频、
 多步骤合成(先生成背景 → 再生成人物 → 合并,中间穿插 ComfyUI 手术式处理)、
-分钟级一镜到底的链式拼接——外加可直接被 agent 加载的 skill,
-让 agent 帮你把目标画面路由到正确的流水线。
+分钟级一镜到底的链式拼接，以及运动优先的提示词编译——外加可直接被 agent
+加载的 skill，让 agent 把目标画面路由到正确流水线，并将导演意图编译成
+可执行的视频指令。
 
 [English README](README.md) · [决策框架](docs/zh/00-decision-framework.md) · [Skills](#agent-skills) · [贡献指南](CONTRIBUTING.md)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![文档: EN + 中文](https://img.shields.io/badge/docs-EN%20%2B%20%E4%B8%AD%E6%96%87-blue)](docs/)
-[![Agent Skills](https://img.shields.io/badge/agent%20skills-3-green)](skills/)
+[![Agent Skills](https://img.shields.io/badge/agent%20skills-4-green)](skills/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 ---
@@ -30,8 +30,8 @@
 中间进 ComfyUI 降噪,最后合并。每个验收通过的产物都会冻结为下一步的输入,
 下游失败时只重试当前步骤,不用把上游全部推倒重来。
 
-这个仓库就是路由层:一套决策框架、按技术分类的实战手册,
-以及让 agent 替你完成路由的 skill。
+这个仓库是控制层:一套决策框架、按技术分类的实战手册,
+以及让 agent 完成镜头路由、步骤规划和提示词编译的 skill。
 
 ## 60 秒速览
 
@@ -73,6 +73,7 @@ flowchart TD
 | 04 | [长镜头一镜到底](docs/zh/04-long-take-continuous-shot.md) | [Long-Take Chaining](docs/en/04-long-take-continuous-shot.md) | 重叠分段 + 连续性锚点,拼出分钟级长镜头。 |
 | 05 | [ComfyUI 集成模式](docs/zh/05-comfyui-integration.md) | [ComfyUI Integration Patterns](docs/en/05-comfyui-integration.md) | 降噪、重打光、潜空间合并、超分——步骤之间的工作台。 |
 | 06 | [管线配方](docs/zh/06-pipeline-recipes.md) | [Pipeline Recipes](docs/en/06-pipeline-recipes.md) | 组合多种技术的端到端完整案例。 |
+| 07 | [运动优先的提示词编译](docs/zh/07-motion-first-prompt-compilation.md) | [Motion-First Prompt Compilation](docs/en/07-motion-first-prompt-compilation.md) | 把导演意图、参考图和模型反馈转化成可执行提示词。 |
 
 ## Agent Skills
 
@@ -84,6 +85,7 @@ flowchart TD
 | [aigc-technique-router](skills/aigc-technique-router/SKILL.md) | 用六个路由问题访谈你的目标镜头,输出带理由的流水线推荐。 |
 | [multistep-video-planner](skills/multistep-video-planner/SKILL.md) | 把镜头描述变成分步执行计划:背景板、中间处理、合并点、质检门。 |
 | [comfyui-denoise-pass](skills/comfyui-denoise-pass/SKILL.md) | 设计管线中段的降噪/重打光步骤:强度区间、节点顺序、失败检查项。 |
+| [compile-video-prompt](skills/compile-video-prompt/SKILL.md) | 把导演意图与有明确类型的参考图编译成一段运动优先提示词和紧凑的 Negative。 |
 
 ## 验证手册
 
@@ -112,6 +114,7 @@ npm test
 3. **升级前先说出是哪个约束失败了**,一次只升一个维度。
 4. **冻结已验收的产物。** 绝不在下游重新生成已批准步骤的上游输入。
 5. **记录失败模式。** 知道什么时候*不该*用某项技术,是手册的一半价值。
+6. **编译意图,不要堆形容词。** 先表达摄影机、主体和场景运动,最后才写影调。
 
 ## License
 
