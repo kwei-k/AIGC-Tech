@@ -104,6 +104,106 @@ test("Agent Skills have minimal valid frontmatter", () => {
   }
 });
 
+test("README Skill badge matches the loadable Skill count", () => {
+  const skillsRoot = path.join(repoRoot, "skills");
+  const skillCount = readdirSync(skillsRoot).filter((folder) =>
+    existsSync(path.join(skillsRoot, folder, "SKILL.md"))
+  ).length;
+
+  assert.match(
+    read("README.md"),
+    new RegExp(`agent%20skills-${skillCount}-green`)
+  );
+  assert.match(
+    read("README.zh-CN.md"),
+    new RegExp(`agent%20skills-${skillCount}-green`)
+  );
+});
+
+test("motion-first prompt template is typed, ordered, and implicitly loadable", () => {
+  const template = read(
+    "skills/write-video-prompt/references/motion-first-template.md"
+  );
+  const skill = read("skills/write-video-prompt/SKILL.md");
+  const metadata = read("skills/write-video-prompt/agents/openai.yaml");
+  const canonicalOrder = [
+    "[CAMERA MOVEMENT]",
+    "[SUBJECT MOTION]",
+    "[SCENE MOTION]",
+    "[LOOK AND FINISH]"
+  ];
+
+  let previousIndex = -1;
+  for (const clause of canonicalOrder) {
+    const index = template.indexOf(clause);
+    assert.ok(index > previousIndex, `${clause} is out of canonical order`);
+    previousIndex = index;
+  }
+
+  for (const role of [
+    "first_frame",
+    "middle_frame",
+    "final_frame",
+    "composition_reference",
+    "camera_reference",
+    "action_reference",
+    "look_reference",
+    "character_identity",
+    "wardrobe_reference",
+    "ui_packaging_reference"
+  ]) {
+    assert.match(template, new RegExp(`\\b${role}\\b`));
+  }
+
+  assert.match(template, /composition_reference.*frame anchor/is);
+  assert.match(template, /generic negative list/i);
+  assert.match(skill, /references\/motion-first-template\.md/);
+  assert.match(template, /Negative:/);
+  assert.match(metadata, /allow_implicit_invocation:\s*true/);
+
+  const example = template.slice(template.indexOf("### Minimal brief"));
+  let exampleIndex = -1;
+  for (const phrase of [
+    "slow steady dolly-in",
+    "a poised young woman walks",
+    "hair and soft fabric respond",
+    "soft directional key light"
+  ]) {
+    const index = example.indexOf(phrase);
+    assert.ok(index > exampleIndex, `${phrase} is out of order in the worked example`);
+    exampleIndex = index;
+  }
+});
+
+test("video prompt Skill stays a single-pass writing template", () => {
+  const skill = read("skills/write-video-prompt/SKILL.md");
+  const template = read(
+    "skills/write-video-prompt/references/motion-first-template.md"
+  );
+  const englishDoc = read("docs/en/07-motion-first-video-prompt-template.md");
+  const chineseDoc = read("docs/zh/07-motion-first-video-prompt-template.md");
+  const readmes = `${read("README.md")}\n${read("README.zh-CN.md")}`;
+  const sources = [skill, template, englishDoc, chineseDoc, readmes];
+
+  assert.match(skill, /initial prompt writing only/i);
+  assert.match(skill, /Do not inspect or score generated videos/i);
+  assert.match(template, /writing template for a single prompt/i);
+  assert.match(englishDoc, /not a prompt-iteration system/i);
+  assert.match(chineseDoc, /不是提示词迭代系统/);
+
+  for (const source of sources) {
+    assert.doesNotMatch(source, /observed_model_failures/);
+    assert.doesNotMatch(source, /Revision\s*{/);
+    assert.doesNotMatch(source, /Model-feedback revisions/i);
+    assert.doesNotMatch(source, /Failed-generation patch/i);
+    assert.doesNotMatch(source, /production-adapters/);
+    assert.doesNotMatch(source, /ControlSurface\s*{/);
+    assert.doesNotMatch(source, /responsible_clause_or_binding/);
+    assert.doesNotMatch(source, /compile-video-prompt/);
+    assert.doesNotMatch(source, /prompt-compilation/);
+  }
+});
+
 test("README describes empty workflow and asset directories honestly", () => {
   const readme = read("README.md");
   const chineseReadme = read("README.zh-CN.md");

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Motion-First Video Prompt"
+  short_description: "Write one concise motion-first video generation prompt"
+  default_prompt: "Use $write-video-prompt to turn this shot brief and its references into one copy-ready video generation prompt."
+
+policy:
+  allow_implicit_invocation: true
