@@ -1,0 +1,15 @@
+{
+  "target": "dreamina",
+  "prompt": "Image 1 is a composition reference only. Eye-level medium-full shot, a slow dolly-in with gentle lateral tracking; a poised young woman walks diagonally toward the camera with measured steps, relaxed shoulders and a steady gaze; her hair and light fabric respond to the breeze as the background shifts with natural parallax; soft directional light, restrained colors and delicate highlight roll-off.",
+  "model": "seedance2.0",
+  "duration": 5,
+  "resolution": "720p",
+  "ratio": "16:9",
+  "assets": [
+    {
+      "type": "image",
+      "source": "./references/composition example.png",
+      "roles": ["composition_reference"]
+    }
+  ]
+}

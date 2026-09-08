@@ -11,7 +11,7 @@ Turn a shot description into a step-by-step T4 multistep compositing plan: plate
 
 1. Read `../../docs/en/03-multistep-video-generation.md` for the T4 pipeline mechanics and failure modes.
 2. Read `../../docs/en/00-decision-framework.md` for the routing questions (Q1–Q6), escalation discipline, and the freeze-approved-artifacts rule.
-3. Confirm T4 is actually warranted. If the shot has no subject–environment interaction (Q4 = no), say so and recommend the cheaper rung (T0/T1/T2) instead of planning a pipeline. Do not over-escalate. If the shot also exceeds the model's reliable clip length (Q1), note where T5 chaining must wrap the T4 plan.
+3. Confirm T4 is actually warranted by the framework: complex interaction can require it, as can exact camera/geometry without existing footage or a 3D blockout. Q4 = no alone does not rule out T4. If no T4 constraint applies, recommend the cheaper applicable route. If the shot also exceeds the selected model's reliable clip length (Q1), note where T5 chaining must wrap the plan.
 
 ## The plan you must produce
 
@@ -33,6 +33,21 @@ Output a **numbered plan with markdown checkboxes** (`- [ ]`) for every actionab
    Recommend pixel space first, per escalation discipline.
 6. **QA-gate checklist per step** — every step ends with a gate. A step's artifacts must pass its gate before the next step starts, and once approved they are **frozen**: never regenerate an upstream artifact downstream of an approved step (see the framework, section 6). If a gate fails, fix within the step (re-seed, re-prompt, adjust mask) — do not patch it in a later pass.
 7. **Fallback/escalation notes** — name, per step, the likely failure and the one-dimension escalation: subject identity drifts → add/raise IPAdapter weight before anything else; merge edges fail in pixel space → move to latent merge; interaction still reads as fake → escalate that element to T3 (clay-render transfer) for the contact geometry; duration beyond clip length → wrap in T5 chaining.
+
+## Optional prompt writing for the current step
+
+Keep the default plan's prompt skeletons unless the user requests full prompts. For
+a requested step, load [write-video-prompt](../write-video-prompt/SKILL.md) and pass
+its current intent, camera/action requirements, asset roles, and project-specific
+lighting or design constraints. Use write for a fresh prompt and keep for a supplied
+final prompt. Limit the writing handoff to the selected step; do not send a QA history
+or ask the writer to diagnose generated results.
+
+When tool-ready output is requested, use
+[the adaptation guide](../../docs/en/08-seedance-and-dreamina.md) and actual supported
+settings. A placeholder asset is not an uploaded asset. The offline request helper
+does not generate plates or execute this plan. These references require the full
+repository layout described in [the usage guide](../../docs/en/09-usage-guide.md).
 
 ## Worked example
 

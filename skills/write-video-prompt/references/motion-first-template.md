@@ -65,10 +65,17 @@ Every supplied reference must have at least one explicit role:
 | `character_identity` | Face, body identity, silhouette, or design |
 | `wardrobe_reference` | Garment, styling, accessories, or material |
 | `ui_packaging_reference` | Interface, product pack, label, logo, or graphic system |
+| `audio_reference` | Voice, music, rhythm, or sound, with the intended use stated |
 
 One reference may have multiple roles, but each role must be stated. Do not treat a
 `composition_reference` as a frame anchor unless the user explicitly assigns both
 roles.
+
+Video references can carry camera, action, or look roles; audio references carry
+`audio_reference` with a named purpose. A role describes creative intent, not an API
+enum. In particular, `middle_frame` is a requested intermediate state; the selected
+tool may have no corresponding hard-anchor control. For a tool-ready request, read
+[tool handoff](tool-handoff.md) before mapping roles to inputs.
 
 When writing bindings:
 
@@ -147,6 +154,10 @@ Put only compact failure restrictions in `Negative:`. Choose risks relevant to t
 current shot, such as identity drift, anatomy errors, foot sliding, camera jitter,
 unintended cuts, temporal flicker, frame warping, unreadable text, or duplicate limbs.
 Do not paste a generic negative list into every prompt.
+
+This is the plain-text writing format. For API/CLI output, use
+[tool handoff](tool-handoff.md): keep mode preserves supplied text, while write mode
+separates unsupported restrictions from the actual transmitted prompt.
 
 ## 9. Language
 

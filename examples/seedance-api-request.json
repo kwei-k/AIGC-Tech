@@ -1,0 +1,9 @@
+{
+  "target": "seedance-api",
+  "prompt": "Eye-level medium-full shot, a slow dolly-in; a poised young woman walks toward the camera with measured steps and a calm gaze; her coat sways lightly with each step; soft side lighting and restrained neutral colors.",
+  "model": "doubao-seedance-2-0-260128",
+  "duration": 5,
+  "resolution": "720p",
+  "ratio": "16:9",
+  "assets": []
+}

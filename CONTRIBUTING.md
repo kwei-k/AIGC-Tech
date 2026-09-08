@@ -16,6 +16,14 @@ pipeline that actually shipped.
   Agent Skills format (YAML frontmatter with `name` and `description`, then instructions).
 - **Workflows**: ComfyUI workflow JSONs go in `workflows/` and must be loadable with the
   nodes listed in the accompanying markdown note.
+- **Tool adaptation**: document asset-role mappings, supported parameters, and the
+  exact API source or CLI help version checked. Keep API behavior separate from a
+  CLI's aliases and defaults. Include an offline request example when supported by
+  `scripts/prepare-video-request.mjs`.
+- **Usage cases**: connect a brief, explicit reference roles, a final prompt,
+  model/tool version, parameters, and an externally hosted video result. Include
+  the verification date and visible limitations. Label an unrun example as
+  illustrative; only mark a case as tested when its result can be inspected.
 
 ## Rules
 
@@ -25,6 +33,12 @@ pipeline that actually shipped.
 3. Every claim about a tool's behavior should be verifiable — cite a version or a date
    when behavior is version-sensitive.
 4. Keep it practical: this is a playbook for people shipping shots, not a survey paper.
+5. Prompt writing remains optional and single-pass. Preserve a user's final prompt
+   when requested. Tool adaptation must not introduce generated-result scoring,
+   prompt-version state, or an automatic refinement loop.
+6. Request preparation stays offline. Do not add credentials, automatic uploads, or
+   paid generation to the helper or its tests. Example asset sources are placeholders;
+   never present them as tested media.
 
 ## Validate a change
 
@@ -34,8 +48,10 @@ Run the zero-dependency suite before opening a PR:
 npm test
 ```
 
-It checks the executable routing cases, local Markdown links, English/Chinese filename
-parity, Skill metadata, and claims about workflow/assets that are actually present.
+It checks the executable routing cases, offline request mappings, local Markdown links,
+English/Chinese filename parity, Skill metadata, and claims about workflow/assets that
+are actually present. Preparation tests do not establish generation quality or account
+access to a model.
 When editing a Skill, also validate its folder with the Agent Skills validator available
 in your agent environment.
 

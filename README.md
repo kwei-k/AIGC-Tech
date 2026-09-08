@@ -9,7 +9,7 @@ with surgical ComfyUI passes in between), and long-take chaining for minutes-lon
 one-shots, and a motion-first prompt-writing template — plus agent-loadable skills that route
 your target frame and turn director intent into executable video instructions.
 
-[中文 README](README.zh-CN.md) · [Decision Framework](docs/en/00-decision-framework.md) · [Skills](#agent-skills) · [Contributing](CONTRIBUTING.md)
+[中文 README](README.zh-CN.md) · [Usage Guide](docs/en/09-usage-guide.md) · [Seedance / Dreamina](docs/en/08-seedance-and-dreamina.md) · [Decision Framework](docs/en/00-decision-framework.md) · [Skills](#agent-skills)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Docs: EN + 中文](https://img.shields.io/badge/docs-EN%20%2B%20%E4%B8%AD%E6%96%87-blue)](docs/)
@@ -17,6 +17,29 @@ your target frame and turn director intent into executable video instructions.
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 ---
+
+## Start here
+
+Use the [usage guide](docs/en/09-usage-guide.md) to choose a Skill, keep an existing
+prompt or ask for one fresh draft, and prepare a request for Seedance API or Dreamina
+CLI. The [adaptation guide](docs/en/08-seedance-and-dreamina.md) explains how first
+frames, first/last frames, and semantic references map to each tool.
+
+In a checkout, ask your agent:
+
+```text
+Read skills/write-video-prompt/SKILL.md. Write one prompt for Dreamina CLI from my
+current brief. This image defines the person; the other image is composition only.
+```
+
+With a finalized prompt, prepare the illustrative request locally:
+
+```bash
+node scripts/prepare-video-request.mjs --input examples/video-request.json
+```
+
+This helper outputs request data only; it does not write prompts or generate video.
+The JSON examples are illustrative. Real video case studies are a future contribution.
 
 ## Why this repo exists
 
@@ -78,6 +101,8 @@ Full composable routing map, scenario table, and escalation rules:
 | 05 | [ComfyUI Integration Patterns](docs/en/05-comfyui-integration.md) | [ComfyUI 集成模式](docs/zh/05-comfyui-integration.md) | Denoise, relight, latent-merge, upscale — the workbench between steps. |
 | 06 | [Pipeline Recipes](docs/en/06-pipeline-recipes.md) | [管线配方](docs/zh/06-pipeline-recipes.md) | End-to-end worked examples combining the techniques. |
 | 07 | [Motion-First Video Prompt Template](docs/en/07-motion-first-video-prompt-template.md) | [运动优先的视频提示词写作模板](docs/zh/07-motion-first-video-prompt-template.md) | Structure director intent and typed references as one copy-ready prompt. |
+| 08 | [Seedance and Dreamina Adaptation](docs/en/08-seedance-and-dreamina.md) | [Seedance 与即梦工具适配](docs/zh/08-seedance-and-dreamina.md) | Match reference roles and final prompts to the supported tool inputs. |
+| 09 | [Usage Guide](docs/en/09-usage-guide.md) | [使用指南](docs/zh/09-usage-guide.md) | Choose and install Skills, opt into prompt writing, and prepare an offline request. |
 
 ## Agent Skills
 
@@ -89,7 +114,11 @@ packages the routing logic so an agent can plan your pipeline instead of guessin
 | [aigc-technique-router](skills/aigc-technique-router/SKILL.md) | Interviews you about the target shot (the six routing questions) and returns a recommended pipeline with rationale. |
 | [multistep-video-planner](skills/multistep-video-planner/SKILL.md) | Turns a shot description into a step-by-step multistep plan: plates, passes, merge points, QA gates. |
 | [comfyui-denoise-pass](skills/comfyui-denoise-pass/SKILL.md) | Designs the mid-pipeline denoise/relight pass: strength ranges, node order, failure checks. |
-| [write-video-prompt](skills/write-video-prompt/SKILL.md) | Writes one motion-first prompt from the current director brief and typed references, followed by a compact Negative line. |
+| [write-video-prompt](skills/write-video-prompt/SKILL.md) | Writes one motion-first prompt from the current brief and typed references, with target-specific handoff guidance when requested. |
+
+Use a complete checkout for the full Skill set: the router, planner, and denoise
+Skill depend on the manual. The writer can be installed as its complete folder,
+including its references. See [installation and invocation](docs/en/09-usage-guide.md#4-install-without-losing-the-reference-documents).
 
 ## Validate the playbook
 
@@ -105,7 +134,8 @@ npm test
 ```
 ├── docs/en, docs/zh      # the playbook, mirrored in English and Chinese
 ├── skills/               # agent-loadable skills (SKILL.md format)
-├── scripts/              # executable reference implementation of the routing rules
+├── scripts/              # routing reference and offline video-request preparation
+├── examples/             # illustrative request inputs; no generated-video claims
 ├── tests/                # routing cases and repository consistency checks
 ├── workflows/            # contribution contract; executable examples are not committed yet
 ├── assets/               # reserved for future stills; current diagrams use Mermaid in docs
