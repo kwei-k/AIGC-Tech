@@ -72,6 +72,24 @@ Your answer must contain all five of:
 
    Only link docs that exist; check before linking.
 
+## Optional prompt and tool handoff
+
+After routing, follow the user's requested deliverable. A routing-only request ends
+with the recommendation above. If the user also wants a prompt, load the repository's
+[write-video-prompt Skill](../write-video-prompt/SKILL.md): use write for a new brief,
+or keep for a supplied final prompt. Pass the current shot requirements and explicit
+asset roles. Do not turn a known composition reference into a first frame.
+
+If API/CLI output is requested, also read
+[the tool adaptation guide](../../docs/en/08-seedance-and-dreamina.md). Choose a
+supported tool mode separately from T0–T5; a model name is not a new technique rung.
+Preparing a request is an offline handoff, not permission to submit generation.
+
+These relative references require the full repository layout. If using a separately
+installed router without those files, report the missing dependency rather than
+pretending the linked writing Skill or helper is available. See
+[the usage guide](../../docs/en/09-usage-guide.md) for installation choices.
+
 ## Routing discipline
 
 - **Never skip rungs without a constraint that demands it.** A shot that Kling or a

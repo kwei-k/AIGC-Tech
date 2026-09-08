@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "node --test",
+    "prepare:video": "node scripts/prepare-video-request.mjs",
     "validate": "node --test tests/repository.test.mjs"
   },
   "engines": {

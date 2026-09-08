@@ -8,7 +8,7 @@
 加载的 skill，让 agent 把目标画面路由到正确流水线，并将导演意图整理成
 可执行的视频指令。
 
-[English README](README.md) · [决策框架](docs/zh/00-decision-framework.md) · [Skills](#agent-skills) · [贡献指南](CONTRIBUTING.md)
+[English README](README.md) · [使用指南](docs/zh/09-usage-guide.md) · [Seedance / 即梦适配](docs/zh/08-seedance-and-dreamina.md) · [决策框架](docs/zh/00-decision-framework.md) · [Skills](#agent-skills)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![文档: EN + 中文](https://img.shields.io/badge/docs-EN%20%2B%20%E4%B8%AD%E6%96%87-blue)](docs/)
@@ -16,6 +16,29 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 ---
+
+## 从这里开始
+
+通过[使用指南](docs/zh/09-usage-guide.md)选择 Skill，决定沿用现有提示词还是
+让 agent 写一次，再整理用于 Seedance API 或即梦 CLI 的请求。
+[适配说明](docs/zh/08-seedance-and-dreamina.md)解释首帧、首尾帧和语义参考素材
+如何对应工具实际支持的输入。
+
+在仓库中，可以直接对 agent 说：
+
+```text
+读取 skills/write-video-prompt/SKILL.md，根据我的当前需求写一条即梦 CLI
+提示词。这张图定义人物，另一张图只参考构图。
+```
+
+提示词定稿后，可以在本地整理示意请求：
+
+```bash
+node scripts/prepare-video-request.mjs --input examples/video-request.json
+```
+
+该工具只输出请求数据，不写提示词、不生成视频。JSON 示例是示意输入，
+真实视频案例留待后续补充。
 
 ## 为什么会有这个仓库
 
@@ -74,6 +97,8 @@ flowchart TD
 | 05 | [ComfyUI 集成模式](docs/zh/05-comfyui-integration.md) | [ComfyUI Integration Patterns](docs/en/05-comfyui-integration.md) | 降噪、重打光、潜空间合并、超分——步骤之间的工作台。 |
 | 06 | [管线配方](docs/zh/06-pipeline-recipes.md) | [Pipeline Recipes](docs/en/06-pipeline-recipes.md) | 组合多种技术的端到端完整案例。 |
 | 07 | [运动优先的视频提示词写作模板](docs/zh/07-motion-first-video-prompt-template.md) | [Motion-First Video Prompt Template](docs/en/07-motion-first-video-prompt-template.md) | 把当前导演意图和有明确身份的参考图组织成一段可直接复制的提示词。 |
+| 08 | [Seedance 与即梦工具适配](docs/zh/08-seedance-and-dreamina.md) | [Seedance and Dreamina Adaptation](docs/en/08-seedance-and-dreamina.md) | 把参考素材角色和最终提示词对应到工具支持的输入。 |
+| 09 | [使用指南](docs/zh/09-usage-guide.md) | [Usage Guide](docs/en/09-usage-guide.md) | 选择与安装 Skill、按需写提示词、离线整理请求。 |
 
 ## Agent Skills
 
@@ -85,7 +110,11 @@ flowchart TD
 | [aigc-technique-router](skills/aigc-technique-router/SKILL.md) | 用六个路由问题访谈你的目标镜头,输出带理由的流水线推荐。 |
 | [multistep-video-planner](skills/multistep-video-planner/SKILL.md) | 把镜头描述变成分步执行计划:背景板、中间处理、合并点、质检门。 |
 | [comfyui-denoise-pass](skills/comfyui-denoise-pass/SKILL.md) | 设计管线中段的降噪/重打光步骤:强度区间、节点顺序、失败检查项。 |
-| [write-video-prompt](skills/write-video-prompt/SKILL.md) | 根据当前导演需求和有明确身份的参考图，写一段运动优先提示词和紧凑的 Negative。 |
+| [write-video-prompt](skills/write-video-prompt/SKILL.md) | 根据当前需求和有明确身份的参考素材写一次运动优先提示词，按需提供目标工具的交接说明。 |
+
+使用完整 Skill 集合时，请保留整个仓库：路由、规划和降噪 Skill 依赖手册正文。
+写作 Skill 可以连同参考文档一起独立安装，具体见
+[安装与调用说明](docs/zh/09-usage-guide.md#4-安装时保留参考文档)。
 
 ## 验证手册
 
@@ -100,7 +129,8 @@ npm test
 ```
 ├── docs/en, docs/zh      # 手册正文,中英双语镜像
 ├── skills/               # agent 可加载的 skill(SKILL.md 格式)
-├── scripts/              # 路由规则的可执行参考实现
+├── scripts/              # 路由参考实现与视频请求离线整理
+├── examples/             # 示意请求输入;不代表已生成视频
 ├── tests/                # 路由案例与仓库一致性检查
 ├── workflows/            # 工作流贡献约定;暂未提交可执行示例
 ├── assets/               # 预留静帧目录;当前示意图直接用 Mermaid

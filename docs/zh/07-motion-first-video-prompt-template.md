@@ -209,6 +209,12 @@ Negative: identity drift, stiff gait, foot sliding, abrupt gesture changes, exag
 
 ## Agent 实现
 
+已经有定稿提示词时，选择 **keep（沿用）**，原文不变；需要从当前需求写一条
+提示词时，选择 **write（代写）**，应用本章模板一次。这是 Skill 的行为选项，
+不是模型参数。请求 API／CLI 用法时，还要映射素材身份和支持的设置；
+`Negative:` 文本不代表接口存在独立负面提示词字段。参见
+[工具适配](08-seedance-and-dreamina.md)和[使用说明](09-usage-guide.md)。
+
 可加载的写作模板封装在
 [`write-video-prompt`](../../skills/write-video-prompt/SKILL.md) 中。
 其内部规范使用英文编写，默认输出不会展示意图理解过程。

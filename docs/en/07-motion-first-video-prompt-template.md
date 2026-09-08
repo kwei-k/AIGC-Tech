@@ -219,6 +219,13 @@ Negative: identity drift, stiff gait, foot sliding, abrupt gesture changes, exag
 
 ## Agent implementation
 
+When a final prompt is supplied for use, choose **keep** to preserve it unchanged.
+Choose **write** to apply this template once to the current brief. These are Skill
+behaviors, not model parameters. API/CLI-ready output additionally maps explicit
+asset roles and supported settings; a `Negative:` line does not imply a dedicated
+negative-prompt field. See [tool adaptation](08-seedance-and-dreamina.md) and
+[the usage guide](09-usage-guide.md).
+
 The loadable writing template is packaged in
 [`write-video-prompt`](../../skills/write-video-prompt/SKILL.md). Its internal
 specification is written in English and does not expose its interpretation process in
